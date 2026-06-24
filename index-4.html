@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheval26 — Courses du jour</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b130d;--surface:#112016;--surface2:#19301f;--surface3:#21402a;
+  --border:#284a33;--border2:#356046;
+  --brass:#e0ad4d;--brass2:#f4cf86;--turf:#3ec873;--rail:#f1ece0;
+  --jaune:#ffd23d;--rouge:#ff5a52;--vert:#5fe39a;--bleu:#57c8ff;--violet:#bb86ff;
+  --text:#eaf1ea;--text2:#90a899;--text3:#5a6f62;
+  --mono:'JetBrains Mono','SF Mono','Consolas','Courier New',monospace;
+}
+body{
+  background:
+    radial-gradient(900px 400px at 50% -120px,rgba(62,200,115,.10),transparent 70%),
+    var(--bg);
+  color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  padding:0 14px 40px;max-width:780px;margin:0 auto;-webkit-tap-highlight-color:transparent;
+}
+
+/* ===== MASTHEAD ===== */
+.masthead{padding:22px 2px 0;}
+.eyebrow{font-size:10px;letter-spacing:4px;color:var(--brass);font-weight:800;text-transform:uppercase;font-family:var(--mono);}
+.masthead h1{font-size:27px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:7px 0 9px;color:var(--rail);}
+.masthead h1 b{color:var(--brass);font-weight:900;}
+.finish{height:9px;border-radius:3px;margin-bottom:5px;
+  background-image:
+    linear-gradient(45deg,#101a12 25%,transparent 25%,transparent 75%,#101a12 75%),
+    linear-gradient(45deg,#101a12 25%,#e9e3d4 25%,#e9e3d4 75%,#101a12 75%);
+  background-size:14px 14px;background-position:0 0,7px 7px;opacity:.55;}
+.sub{font-size:12px;color:var(--text2);margin-bottom:20px;font-family:var(--mono);}
+
+/* ===== CARDS ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:800;color:var(--rail);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:"";width:4px;height:14px;background:var(--brass);border-radius:2px;display:inline-block;}
+label{font-size:10px;color:var(--text3);display:block;margin-bottom:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+input,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:#fff;font-family:var(--mono);outline:none;}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:#fff;font-family:var(--mono);outline:none;min-height:110px;resize:vertical;line-height:1.5;}
+textarea:focus{border-color:var(--brass);}
+textarea::placeholder{color:var(--text3);}
+input::placeholder{color:var(--text3);}
+input:focus,select:focus{border-color:var(--brass);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.row-date{display:grid;grid-template-columns:1fr 1.4fr;gap:9px;margin-bottom:10px;}
+
+.btn{width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;border:none;transition:filter .15s,background .15s;}
+.btn-run{background:var(--brass);color:#19130a;letter-spacing:.5px;margin-top:4px;}
+.btn-run:hover{filter:brightness(1.07);}
+.btn-sm{padding:9px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:rgba(224,173,77,.12);border:1px solid rgba(224,173,77,.3);color:var(--brass);}
+.btn-sm:hover{background:rgba(224,173,77,.2);}
+.btn-red{background:rgba(255,90,82,.08)!important;border-color:rgba(255,90,82,.25)!important;color:var(--rouge)!important;}
+
+/* ===== MOTS ===== */
+.word-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.wc{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--turf);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:13px;font-family:var(--mono);color:#fff;font-weight:600;}
+.wc input{width:15px;height:15px;accent-color:var(--turf);}
+
+/* ===== TRACEURS ===== */
+.traceur-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+.tchip{background:rgba(255,210,61,.1);border:1px solid rgba(255,210,61,.32);color:var(--jaune);padding:4px 11px;border-radius:7px;font-size:12px;font-family:var(--mono);display:flex;gap:6px;align-items:center;font-weight:700;}
+.tchip.rouge{background:rgba(255,90,82,.12);border-color:rgba(255,90,82,.4);color:var(--rouge);}
+.tchip .del{cursor:pointer;color:var(--rouge);}
+.add-row{display:flex;gap:7px;}
+.add-row input{flex:1;}
+.t-label{margin-top:14px;}
+
+/* ===== CHEVAUX ===== */
+.horse-card{background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:11px 11px 11px 12px;position:relative;margin-bottom:8px;display:flex;align-items:center;gap:11px;}
+.horse-fields{flex:1;display:flex;flex-direction:column;gap:6px;}
+.saddle{flex:none;width:30px;height:34px;border-radius:5px 5px 7px 7px;background:linear-gradient(180deg,var(--brass),#b9852f);color:#19130a;font-family:var(--mono);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);}
+.horse-card input{flex:1;}
+.horse-del{flex:none;background:transparent;border:none;color:var(--rouge);cursor:pointer;font-size:16px;padding:4px;}
+.horse-empty{font-size:12px;color:var(--text3);text-align:center;padding:8px;}
+
+/* ===== RESULTATS ===== */
+.stat-line{font-size:12px;color:var(--text2);font-family:var(--mono);margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
+.stat-line b{color:var(--brass);}
+.horse-group{margin-bottom:18px;}
+.horse-group-title{font-size:14px;font-weight:800;color:var(--rail);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;}
+.hg-disc{width:24px;height:27px;border-radius:4px 4px 6px 6px;background:linear-gradient(180deg,var(--turf),#229152);color:#06140b;font-family:var(--mono);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.hg-count{font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;margin-left:auto;}
+
+.result-card{background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:12px;margin-bottom:8px;}
+.result-card.double{border-color:var(--brass);box-shadow:0 0 0 1px rgba(224,173,77,.3);}
+.rc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
+.rb{font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:6px;font-weight:800;}
+.rb-t{background:rgba(255,210,61,.15);color:var(--jaune);}
+.rb-r{background:rgba(255,90,82,.16);color:var(--rouge);}
+.rb-x2{background:rgba(224,173,77,.18);color:var(--brass2);}
+.rb-j{background:rgba(87,200,255,.16);color:var(--bleu);}
+.rb-tpl{background:rgba(255,255,255,.07);color:var(--text2);}
+.phrase-checks{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:4px;}
+.rc-phrase{font-size:14px;font-family:var(--mono);color:var(--text);font-weight:700;cursor:pointer;letter-spacing:.3px;}
+.empty{text-align:center;padding:26px;font-size:12px;color:var(--text3);line-height:1.7;}
+
+.detail{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);}
+.detail-phrase{font-size:11px;font-family:var(--mono);color:var(--text2);margin-bottom:9px;word-break:break-all;background:var(--surface3);padding:7px 9px;border-radius:6px;}
+.detail-table{width:100%;border-collapse:collapse;font-family:var(--mono);}
+.detail-table th{font-size:8px;color:var(--text3);text-transform:uppercase;padding:5px 3px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;}
+.detail-table td{font-size:12px;font-weight:700;padding:6px 3px;text-align:center;border-bottom:1px solid rgba(40,74,51,.4);}
+.detail-table td:first-child{font-size:9px;color:var(--text3);text-transform:uppercase;text-align:left;font-weight:600;}
+.c-red{color:var(--rouge);}
+.c-rouge-hit{color:#ff342b;font-weight:800;text-shadow:0 0 6px rgba(255,52,43,.5);}
+.c-yellow{color:var(--jaune);}
+.c-green{color:var(--vert);}
+.c-white{color:#fff;}
+.c-neutral{color:var(--text2);}
+
+/* ===== CARNET ===== */
+.carnet-btn{width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;border:none;background:rgba(187,134,255,.13);border:1px solid rgba(187,134,255,.35);color:var(--violet);margin-top:4px;transition:background .15s;}
+.carnet-btn:hover{background:rgba(187,134,255,.23);}
+.semaine-header{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;}
+.semaine-header:hover{border-color:var(--violet);}
+.semaine-label{font-size:13px;font-weight:800;color:var(--violet);}
+.semaine-count{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.semaine-chevron{color:var(--text3);font-size:12px;transition:transform .2s;}
+.semaine-chevron.open{transform:rotate(180deg);}
+.semaine-body{display:none;margin-bottom:12px;}
+.semaine-body.open{display:block;}
+.traceur-bloc{margin-bottom:14px;}
+.traceur-bloc-title{font-size:12px;font-weight:800;color:var(--jaune);font-family:var(--mono);margin:10px 0 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+.cat-count{background:var(--surface3);color:var(--text3);border-radius:10px;padding:1px 8px;font-size:10px;font-family:var(--mono);}
+.hit-saved{background:var(--surface3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:6px;position:relative;}
+.hit-saved-phrase{font-size:12px;font-family:var(--mono);color:var(--text);font-weight:700;margin-bottom:5px;cursor:pointer;}
+.hit-saved-meta{font-size:10px;color:var(--text3);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hit-saved-del{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--rouge);cursor:pointer;font-size:14px;padding:2px 5px;}
+.hit-saved-detail{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:none;}
+.hit-saved-detail.open{display:block;}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:15px;padding:20px;width:100%;max-width:400px;}
+.modal-title{font-size:14px;font-weight:800;color:var(--violet);margin-bottom:7px;}
+.modal-phrase{font-size:11px;font-family:var(--mono);color:var(--text2);background:var(--surface2);padding:9px;border-radius:7px;margin-bottom:14px;line-height:1.5;}
+.modal-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;display:block;}
+.modal-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);outline:none;margin-bottom:14px;}
+.modal-select:focus{border-color:var(--violet);}
+.modal-btns{display:flex;gap:8px;}
+.modal-ok{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;border:none;background:rgba(187,134,255,.2);border:1px solid rgba(187,134,255,.4);color:var(--violet);}
+.modal-cancel{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;border:none;background:rgba(255,90,82,.1);border:1px solid rgba(255,90,82,.25);color:var(--rouge);}
+.incl-row{display:flex;gap:16px;margin:4px 0 12px;flex-wrap:wrap;}
+.mini-check{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:600;cursor:pointer;margin:0;}
+.mini-check input{width:14px;height:14px;accent-color:var(--brass);}
+.preview{margin-top:11px;font-size:11px;font-family:var(--mono);color:var(--brass2);background:var(--surface2);border:1px dashed var(--border2);border-radius:8px;padding:9px 11px;line-height:1.5;word-break:break-word;}
+.preview b{color:var(--text3);font-weight:700;}
+.pmu-status{font-size:11px;font-family:var(--mono);color:var(--text2);margin-top:9px;min-height:14px;line-height:1.5;}
+.pmu-status.err{color:var(--rouge);}
+.pmu-status.ok{color:var(--vert);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">CHEVAL26 · TURF</div>
+  <h1>Courses <b>du jour</b></h1>
+  <div class="finish"></div>
+  <div class="sub">Détection de traceurs sur les partants &mdash; système alphanumérique P/Q/LOG</div>
+</div>
+
+<!-- DATE + PRIX -->
+<div class="card">
+  <div class="card-title">Date &amp; course</div>
+  <div class="row-date">
+    <div>
+      <label>Jour</label>
+      <select id="inp-jour" onchange="updatePreview()">
+        <option value="">AUCUN (date sans jour)</option>
+        <option>LUNDI</option><option>MARDI</option><option>MERCREDI</option><option>JEUDI</option>
+        <option>VENDREDI</option><option>SAMEDI</option><option>DIMANCHE</option>
+      </select>
+    </div>
+    <div>
+      <label>Date (ex: 22 JUIN 2026)</label>
+      <input type="text" id="inp-date" value="22 JUIN 2026" oninput="updatePreview()">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Heure de la course</label>
+      <input type="text" id="inp-heure" placeholder="Ex: 14H34" oninput="updatePreview()">
+    </div>
+    <div>
+      <label>Prix (un seul)</label>
+      <input type="text" id="inp-prix" placeholder="Ex: PRIX DU CORNULIER 2026" oninput="updatePreview()">
+    </div>
+  </div>
+  <label class="t-label">Phrases à tester (coche celles que tu veux)</label>
+  <div class="phrase-checks">
+    <label class="mini-check"><input type="checkbox" id="ph-prix" checked onchange="updatePreview()"> Prix seul</label>
+    <label class="mini-check"><input type="checkbox" id="ph-date" checked onchange="updatePreview()"> Date</label>
+    <label class="mini-check"><input type="checkbox" id="ph-heure" checked onchange="updatePreview()"> Date + heure</label>
+  </div>
+  <div class="preview" id="preview"></div>
+</div>
+
+<!-- PMU -->
+<div class="card">
+  <div class="card-title">Charger les courses (PMU)</div>
+  <label>Jour des courses</label>
+  <input type="date" id="pmu-date">
+  <button class="btn-sm" style="width:100%;margin-top:8px;" onclick="chargerProgramme()">Charger le programme</button>
+  <div id="pmu-status" class="pmu-status"></div>
+  <label class="t-label">Relais perso (optionnel — débloque l'auto en local)</label>
+  <input type="text" id="pmu-proxy" placeholder="https://xxxx.workers.dev/?url=" onchange="savePmuProxy()">
+  <button class="btn-sm" style="width:100%;margin-top:6px;background:#1a3a5c;" onclick="testerRelais()">Tester le relais</button>
+  <div id="relais-test-result" style="font-size:11px;margin-top:4px;word-break:break-all;"></div>
+  <div id="pmu-pick" style="display:none;">
+    <label class="t-label">Réunion</label>
+    <select id="pmu-reunion" onchange="onReunionChange()"></select>
+    <label class="t-label">Course</label>
+    <select id="pmu-course"></select>
+    <button class="btn-sm" style="width:100%;margin-top:10px;" onclick="remplirChevaux()">Mettre les chevaux dans l'outil</button>
+    <button class="btn-sm" style="width:100%;margin-top:8px;" onclick="remplirJockeys()">Mettre les jockeys dans l'outil</button>
+  </div>
+</div>
+
+<!-- CHEVAUX -->
+<div class="card">
+  <div class="card-title">Chevaux à tester</div>
+  <div id="horse-list"></div>
+  <button class="btn-sm" style="width:100%;margin-top:6px;" onclick="addCheval()">+ Ajouter un cheval</button>
+</div>
+
+<button class="btn btn-run" onclick="analyser()">Analyser — trouver les traceurs</button>
+
+<!-- RESULTATS -->
+<div class="card" id="results-card" style="display:none;margin-top:14px;">
+  <div class="card-title">Résultats</div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Reste appuyé sur un hit pour l'enregistrer dans ton carnet.</div>
+  <div class="stat-line" id="stat-line"></div>
+  <div id="results"></div>
+</div>
+
+<button class="carnet-btn" onclick="toggleCarnet()">Mon carnet de traceurs</button>
+
+<!-- CARNET -->
+<div class="card" id="carnet-card" style="display:none;margin-top:10px;">
+  <div class="card-title">Carnet de traceurs — par semaine</div>
+  <div id="carnet-body"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-save">
+  <div class="modal-box">
+    <div class="modal-title">Enregistrer ce hit</div>
+    <div class="modal-phrase" id="modal-phrase-text"></div>
+    <label class="modal-label">Dans quelle semaine ?</label>
+    <select class="modal-select" id="modal-semaine-sel"></select>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Annuler</button>
+      <button class="modal-ok" onclick="confirmerSave()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== FORMULE (identique au système foot) =====
+function P(c){ return (c>='A'&&c<='Z') ? c.charCodeAt(0)-64 : 0; }
+function Q(c){ return (c>='A'&&c<='Z') ? 91-c.charCodeAt(0) : 0; }
+
+function numFR(n){
+  n=parseInt(n,10);
+  var u=['','UN','DEUX','TROIS','QUATRE','CINQ','SIX','SEPT','HUIT','NEUF','DIX','ONZE','DOUZE','TREIZE','QUATORZE','QUINZE','SEIZE'];
+  if(n===0)return 'ZERO'; if(n<=16)return u[n];
+  if(n===17)return 'DIXSEPT'; if(n===18)return 'DIXHUIT'; if(n===19)return 'DIXNEUF';
+  if(n===20)return 'VINGT'; if(n===21)return 'VINGTETUN';
+  if(n>=22&&n<=29)return 'VINGT'+numFR(n-20);
+  if(n===30)return 'TRENTE'; if(n>=31&&n<=39)return 'TRENTE'+numFR(n-30);
+  if(n===40)return 'QUARANTE'; if(n>=41&&n<=49)return 'QUARANTE'+numFR(n-40);
+  if(n===50)return 'CINQUANTE'; if(n>=51&&n<=59)return 'CINQUANTE'+numFR(n-50);
+  if(n===60)return 'SOIXANTE'; if(n>=61&&n<=69)return 'SOIXANTE'+numFR(n-60);
+  if(n===70)return 'SOIXANTEDIX'; if(n>=71&&n<=79)return 'SOIXANTE'+numFR(n-60);
+  if(n===80)return 'QUATREVINGTS'; if(n>=81&&n<=89)return 'QUATREVINGT'+numFR(n-80);
+  if(n===90)return 'QUATREVINGTDIX'; if(n>=91&&n<=99)return 'QUATREVINGT'+numFR(n-80);
+  if(n===100)return 'CENT';
+  if(n>=101&&n<=999){var c=Math.floor(n/100),r=n%100;return (c===1?'CENT':numFR(c)+'CENT')+(r?numFR(r):'');}
+  if(n>=1000&&n<=9999){var m=Math.floor(n/1000),r2=n%1000;return (m===1?'MILLE':numFR(m)+'MILLE')+(r2?numFR(r2):'');}
+  return String(n);
+}
+function convTok(t){
+  var s=String(t).trim();
+  if(/^\d+$/.test(s))return numFR(parseInt(s,10));
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,'');
+}
+function splitTokens(str){ return String(str).trim().split(/\s+/).filter(Boolean); }
+var VOY={A:1,E:1,I:1,O:1,U:1};
+
+function calc(tokens){
+  var flat=[];
+  var i,j;
+  for(i=0;i<tokens.length;i++){
+    var parts=splitTokens(tokens[i]);
+    for(j=0;j<parts.length;j++){ flat.push(parts[j]); }
+  }
+  var conv='';
+  for(i=0;i<flat.length;i++){ conv+=convTok(flat[i]); }
+  var sp=0,sq=0,spc=0,sqc=0;
+  for(i=0;i<conv.length;i++){
+    var ch=conv.charAt(i);
+    sp+=P(ch); sq+=Q(ch);
+    if(!VOY[ch]){ spc+=P(ch); sqc+=Q(ch); }
+  }
+  var log=sp-sq;
+  return {
+    sp:sp, sq:sq, log:log, conv:conv,
+    traceur:sp, vertG:spc, blancG:sq, vertD:sqc, rouge:Math.abs(log),
+    log3:log*3, log6:log*6, log9:log*9,
+    tr3:sp*3, tr6:sp*6, tr9:sp*9,
+    bg3:sq*3, bg6:sq*6, bg9:sq*9,
+    vg3:spc*3, vg6:spc*6, vg9:spc*9,
+    vd3:sqc*3, vd6:sqc*6, vd9:sqc*9,
+    r3:Math.abs(log)*3, r6:Math.abs(log)*6, r9:Math.abs(log)*9
+  };
+}
+
+// ===== ETAT =====
+var MOTS=[
+  {id:'win',mot:'WIN'},{id:'winner',mot:'WINNER'},
+  {id:'gagne',mot:'GAGNE'},{id:'gagnant',mot:'GAGNANT'}
+];
+var traceurs=[741,740,744,674,734];
+var blancG=[741,740,744,674,734];
+var rougeT=[333,1111];
+var JOURSFR=['DIMANCHE','LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI'];
+var MOISFR=['JANVIER','FEVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOUT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DECEMBRE'];
+
+function colonnesLogiqueRouge(r){ return [r.traceur, r.blancG, r.vertG, r.vertD]; }
+function hitRouge(r){
+  var cols=colonnesLogiqueRouge(r);
+  for(var i=0;i<cols.length;i++){ if(rougeT.indexOf(cols[i])>=0)return true; }
+  return false;
+}
+function valeurRougeTouchee(r){
+  var cols=colonnesLogiqueRouge(r);
+  for(var i=0;i<cols.length;i++){ if(rougeT.indexOf(cols[i])>=0)return cols[i]; }
+  return null;
+}
+function estCelluleRouge(valeur,facteur){
+  if(rougeT.indexOf(valeur)>=0)return true;
+  if(facteur>1 && valeur%facteur===0 && rougeT.indexOf(valeur/facteur)>=0)return true;
+  return false;
+}
+function clsCellule(valeur,facteur,classeParDefaut){
+  return estCelluleRouge(valeur,facteur)?'c-rouge-hit':classeParDefaut;
+}
+
+// ===== HELPERS HTML =====
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return esc(s).replace(/"/g,'&quot;'); }
+
+// ===== MOTS UI =====
+function renderMots(){
+  var html='';
+  for(var i=0;i<MOTS.length;i++){
+    var m=MOTS[i];
+    html+='<label class="wc"><input type="checkbox" id="w-'+m.id+'" checked onchange="updatePreview()"><span>'+m.mot+'</span></label>';
+  }
+  document.getElementById('word-grid').innerHTML=html;
+}
+function cocheTout(v){
+  for(var i=0;i<MOTS.length;i++){ var e=document.getElementById('w-'+MOTS[i].id); if(e)e.checked=v; }
+  updatePreview();
+}
+function getMots(){ return MOTS.slice(); }
+
+// ===== APERCU LIVE =====
+function motCochePremier(){ return MOTS.length?MOTS[0].mot:'[MOT]'; }
+function premierCheval(){
+  for(var i=0;i<chevaux.length;i++){ if(chevaux[i].nom.trim())return chevaux[i].nom.trim().toUpperCase(); }
+  return '[CHEVAL]';
+}
+function getJour(){
+  var jr=document.getElementById('inp-jour').value;
+  return (!jr||jr.toUpperCase().indexOf('AUCUN')===0)?'':jr.toUpperCase();
+}
+function getTemplates(){
+  var jour=getJour();
+  var date=document.getElementById('inp-date').value.trim().toUpperCase();
+  var heure=document.getElementById('inp-heure').value.trim().toUpperCase();
+  var prix=document.getElementById('inp-prix').value.trim().toUpperCase();
+  var tpls=[];
+  if(document.getElementById('ph-prix').checked){ tpls.push({id:'prix',label:'Prix',tokens:[prix]}); }
+  if(document.getElementById('ph-date').checked){ tpls.push({id:'date',label:'Date',tokens:[jour,date]}); }
+  if(document.getElementById('ph-heure').checked){ tpls.push({id:'heure',label:'Date+heure',tokens:[jour,date,heure]}); }
+  return tpls;
+}
+function updatePreview(){
+  var el=document.getElementById('preview'); if(!el)return;
+  var subj=premierCheval();
+  var mot=motCochePremier();
+  var tpls=getTemplates();
+  if(!tpls.length){ el.innerHTML='<b>Aucune phrase sélectionnée.</b>'; return; }
+  var lignes=[];
+  for(var i=0;i<tpls.length;i++){
+    var parts=tpls[i].tokens.concat([subj,mot]);
+    var clean=[];
+    for(var j=0;j<parts.length;j++){ if(parts[j])clean.push(parts[j]); }
+    lignes.push('<b>'+tpls[i].label+' :</b> '+esc(clean.join('  ·  ')));
+  }
+  el.innerHTML=lignes.join('<br>');
+}
+
+// ===== TRACEURS UI =====
+function chipList(arr,cls,rmName){
+  if(!arr.length)return '<span style="font-size:12px;color:var(--text3)">Aucun</span>';
+  var html='';
+  for(var i=0;i<arr.length;i++){
+    html+='<div class="tchip '+cls+'">'+arr[i]+'<span class="del" onclick="'+rmName+'('+i+')">&times;</span></div>';
+  }
+  return html;
+}
+function renderT(){ document.getElementById('t-list').innerHTML=chipList(traceurs,'','rmT'); }
+function renderBG(){ document.getElementById('bg-list').innerHTML=chipList(blancG,'','rmBG'); }
+function renderRT(){ document.getElementById('rt-list').innerHTML=chipList(rougeT,'rouge','rmRT'); }
+function addT(){ var v=parseInt(document.getElementById('inp-t').value,10); if(v&&traceurs.indexOf(v)<0){traceurs.push(v);document.getElementById('inp-t').value='';renderT();} }
+function rmT(i){ traceurs.splice(i,1); renderT(); }
+function addBG(){ var v=parseInt(document.getElementById('inp-bg').value,10); if(v&&blancG.indexOf(v)<0){blancG.push(v);document.getElementById('inp-bg').value='';renderBG();} }
+function rmBG(i){ blancG.splice(i,1); renderBG(); }
+function addRT(){ var v=parseInt(document.getElementById('inp-rt').value,10); if(v&&rougeT.indexOf(v)<0){rougeT.push(v);document.getElementById('inp-rt').value='';renderRT();} }
+function rmRT(i){ rougeT.splice(i,1); renderRT(); }
+
+// ===== CHEVAUX UI =====
+var chevaux=[];
+var cid=0;
+function addCheval(nom){
+  chevaux.push({id:++cid, nom:nom||''});
+  renderChevaux();
+  updatePreview();
+}
+function rmCheval(id){
+  var out=[];
+  for(var i=0;i<chevaux.length;i++){ if(chevaux[i].id!==id)out.push(chevaux[i]); }
+  chevaux=out;
+  renderChevaux();
+  updatePreview();
+}
+function updCheval(id,v){
+  for(var i=0;i<chevaux.length;i++){
+    if(chevaux[i].id===id){
+      chevaux[i].nom=v;
+      if(derniereSource==='jockeys'&&chevaux[i].orig){
+        var cle=chevaux[i].orig;
+        var val=v.trim().toUpperCase();
+        if(val&&val!==cle.toUpperCase()){ jockeyMap[cle]=val; saveJockeyMap(jockeyMap); }
+      }
+      break;
+    }
+  }
+  updatePreview();
+}
+function renderChevaux(){
+  var el=document.getElementById('horse-list');
+  if(!chevaux.length){ el.innerHTML='<div class="horse-empty">Aucun cheval. Clique sur + Ajouter un cheval.</div>'; return; }
+  var html='';
+  for(var i=0;i<chevaux.length;i++){
+    var c=chevaux[i];
+    html+='<div class="horse-card">'
+      +'<div class="saddle">'+(i+1)+'</div>'
+      +'<input type="text" value="'+escAttr(c.nom)+'" placeholder="Nom à tester" oninput="updCheval('+c.id+',this.value)">'
+      +'<button class="horse-del" onclick="rmCheval('+c.id+')">&times;</button>'
+      +'</div>';
+  }
+  el.innerHTML=html;
+}
+
+// ===== PMU (récupération auto) =====
+var PMU_BASES=[
+  'https://online.turfinfo.api.pmu.fr/rest/client/61',
+  'https://offline.turfinfo.api.pmu.fr/rest/client/61',
+  'https://online.turfinfo.api.pmu.fr/rest/client/1',
+  'https://www.pmu.fr/services/turfInfo/client/1'
+];
+var PMU_PROXIES=[
+  'https://api.codetabs.com/v1/proxy/?quest=',
+  'https://api.allorigins.win/raw?url=',
+  'https://corsproxy.io/?url='
+];
+// >>> Pour blinder l'auto (marche meme depuis un fichier local sur le tel),
+// colle ici ton relais Cloudflare, ex: 'https://pmurelais.toncompte.workers.dev/?url='
+var PMU_PROXY_DEFAULT='https://pmurelais.guichard-kevin10.workers.dev/?url=';
+var pmuWorking=null;
+var pmuProgramme=null;
+var pmuDateDDMMYYYY='';
+var pmuAnnee='';
+var derniereSource='';
+function loadJockeyMap(){ try{ return JSON.parse(localStorage.getItem('cheval26_jockeys_map')||'{}'); }catch(e){ return {}; } }
+function saveJockeyMap(m){ try{ localStorage.setItem('cheval26_jockeys_map',JSON.stringify(m)); }catch(e){} }
+var jockeyMap=loadJockeyMap();
+
+function pad2(n){ return (n<10?'0':'')+n; }
+function pmuSetStatus(msg,cls){
+  var el=document.getElementById('pmu-status');
+  if(!el)return;
+  el.className='pmu-status'+(cls?(' '+cls):'');
+  el.textContent=msg;
+}
+function testerRelais(){
+  var el=document.getElementById('relais-test-result');
+  var px=document.getElementById('pmu-proxy').value.trim()||PMU_PROXY_DEFAULT;
+  if(!px){el.style.color='orange';el.textContent='Aucun relais configure.';return;}
+  el.style.color='#aaa';el.textContent='Test en cours...';
+  var testUrl=px+encodeURIComponent('https://online.turfinfo.api.pmu.fr/rest/client/61/programme/'+pmuDateDDMMYYYY);
+  fetch(testUrl)
+    .then(function(r){
+      el.style.color=r.ok?'#4caf50':'orange';
+      el.textContent='Status HTTP: '+r.status+' — URL testee: '+testUrl;
+      return r.text();
+    })
+    .then(function(t){
+      el.textContent+=(' | Debut reponse: '+t.substring(0,80));
+    })
+    .catch(function(e){
+      el.style.color='#f44';
+      el.textContent='ERREUR FETCH: '+e.message+' | URL: '+testUrl;
+    });
+}
+function savePmuProxy(){
+  try{ localStorage.setItem('cheval26_pmu_proxy', document.getElementById('pmu-proxy').value.trim()); }catch(e){}
+}
+function pmuCandidates(path){
+  var list=[];
+  var i,j;
+  var target=PMU_BASES[0]+path;
+  var perso=document.getElementById('pmu-proxy');
+  var px=perso?perso.value.trim():'';
+  if(!px){ px=PMU_PROXY_DEFAULT; }
+  // 1) relais perso / par defaut (le plus fiable, OK depuis un fichier local)
+  if(px){ list.push({url:px+encodeURIComponent(target), base:0, proxy:'perso'}); }
+  // 2) proxies CORS publics (secours, acceptent une origine "null")
+  for(j=0;j<PMU_PROXIES.length;j++){ list.push({url:PMU_PROXIES[j]+encodeURIComponent(target), base:0, proxy:j}); }
+  // 3) acces direct en dernier (ne marche que sur une vraie origine autorisee)
+  for(i=0;i<PMU_BASES.length;i++){ list.push({url:PMU_BASES[i]+path, base:i, proxy:-1}); }
+  return list;
+}
+async function pmuFetchJson(path){
+  var cands=pmuCandidates(path);
+  if(pmuWorking){
+    cands.sort(function(a,b){
+      var am=(a.base===pmuWorking.base&&a.proxy===pmuWorking.proxy)?0:1;
+      var bm=(b.base===pmuWorking.base&&b.proxy===pmuWorking.proxy)?0:1;
+      return am-bm;
+    });
+  }
+  for(var i=0;i<cands.length;i++){
+    try{
+      var resp=await fetch(cands[i].url);
+      if(resp&&resp.ok){
+        var data=await resp.json();
+        pmuWorking={base:cands[i].base,proxy:cands[i].proxy};
+        return data;
+      }
+    }catch(e){}
+  }
+  throw new Error('PMU injoignable');
+}
+
+async function chargerProgramme(){
+  var v=document.getElementById('pmu-date').value;
+  if(!v){ pmuSetStatus('Choisis une date.','err'); return; }
+  var p=v.split('-');
+  pmuDateDDMMYYYY=p[2]+p[1]+p[0];
+  pmuAnnee=p[0];
+  pmuWorking=null;
+  pmuSetStatus('Chargement du programme...','');
+  try{
+    var data=await pmuFetchJson('/programme/'+pmuDateDDMMYYYY);
+    var reunions=(data&&data.programme&&data.programme.reunions)?data.programme.reunions:[];
+    if(!reunions.length){ pmuSetStatus('Aucune réunion pour ce jour.','err'); return; }
+    pmuProgramme=reunions;
+    var sel=document.getElementById('pmu-reunion');
+    var html='';
+    for(var i=0;i<reunions.length;i++){
+      var rnum=reunions[i].numOfficiel||reunions[i].numReunion||(i+1);
+      var hippo=(reunions[i].hippodrome&&(reunions[i].hippodrome.libelleCourt||reunions[i].hippodrome.libelleLong))||'';
+      html+='<option value="'+i+'">R'+rnum+' - '+esc(hippo)+'</option>';
+    }
+    sel.innerHTML=html;
+    onReunionChange();
+    document.getElementById('pmu-pick').style.display='block';
+    pmuSetStatus(reunions.length+' réunion(s) chargée(s). Choisis la course.','ok');
+  }catch(e){
+    pmuSetStatus('Impossible de charger (relais de secours indisponibles ou pas de reseau). Solution sure : colle ton relais Cloudflare dans "Relais perso" ci-dessous, ou saisis les chevaux a la main.','err');
+  }
+}
+
+function onReunionChange(){
+  if(!pmuProgramme)return;
+  var ri=parseInt(document.getElementById('pmu-reunion').value,10)||0;
+  var courses=(pmuProgramme[ri]&&pmuProgramme[ri].courses)?pmuProgramme[ri].courses:[];
+  var sel=document.getElementById('pmu-course');
+  var html='';
+  for(var i=0;i<courses.length;i++){
+    var cnum=courses[i].numOrdre||(i+1);
+    var lib=courses[i].libelle||courses[i].libelleCourt||('Course '+cnum);
+    html+='<option value="'+i+'">C'+cnum+' - '+esc(lib)+'</option>';
+  }
+  sel.innerHTML=html;
+}
+
+function retirerInitiale(s){
+  return String(s).replace(/^[A-Z]{1,3}\.\s*/,'').trim();
+}
+function nomJockeyComplet(p){
+  var prenom=p.prenomDriver||p.driverPrenom||p.prenomJockey||p.jockeyPrenom||p.prenom||'';
+  var nom=p.nomDriver||p.driverNom||p.nomJockey||p.jockeyNom||'';
+  var combo=(prenom+' '+nom).replace(/\s+/g,' ').trim();
+  var simple=p.driver||p.jockey||p.nomDriver||p.nomJockey||'';
+  var res=(combo.length>simple.length)?combo:simple;
+  return retirerInitiale(res);
+}
+async function chargerPartants(mode){
+  if(!pmuProgramme)return;
+  var ri=parseInt(document.getElementById('pmu-reunion').value,10)||0;
+  var ci=parseInt(document.getElementById('pmu-course').value,10)||0;
+  var reunion=pmuProgramme[ri];
+  var course=reunion.courses[ci];
+  var rnum=reunion.numOfficiel||reunion.numReunion||(ri+1);
+  var cnum=course.numOrdre||(ci+1);
+  pmuSetStatus('Chargement des partants R'+rnum+' C'+cnum+'...','');
+  try{
+    var data=await pmuFetchJson('/programme/'+pmuDateDDMMYYYY+'/R'+rnum+'/C'+cnum+'/participants');
+    var parts=(data&&data.participants)?data.participants:[];
+    var items=[];
+    for(var i=0;i<parts.length;i++){
+      var st=parts[i].statut||'';
+      if(st==='NON_PARTANT')continue;
+      if(parts[i].nom){
+        var jk=nomJockeyComplet(parts[i]);
+        items.push({nom:String(parts[i].nom).toUpperCase(), jockey:String(jk).toUpperCase()});
+      }
+    }
+    if(!items.length){ pmuSetStatus('Aucun partant récupéré.','err'); return; }
+    derniereSource=mode;
+    var entrees=[];
+    for(var k=0;k<items.length;k++){
+      var v=(mode==='jockeys')?items[k].jockey:items[k].nom;
+      if(!v)continue;
+      var aff=(mode==='jockeys'&&jockeyMap[v])?jockeyMap[v]:v;
+      entrees.push({nom:aff, orig:v});
+    }
+    if(!entrees.length){ pmuSetStatus((mode==='jockeys')?'Aucun jockey récupéré.':'Aucun cheval récupéré.','err'); return; }
+    chevaux=[]; cid=0;
+    for(var n=0;n<entrees.length;n++){ chevaux.push({id:++cid, nom:entrees[n].nom, orig:entrees[n].orig}); }
+    renderChevaux();
+    var lib=course.libelle||course.libelleCourt||'';
+    lib=lib.split('(')[0].trim();
+    document.getElementById('inp-prix').value=lib?(lib.toUpperCase()+' '+pmuAnnee):'';
+    var dd=parseInt(pmuDateDDMMYYYY.slice(0,2),10);
+    var mm=parseInt(pmuDateDDMMYYYY.slice(2,4),10);
+    var yy=pmuDateDDMMYYYY.slice(4);
+    document.getElementById('inp-date').value=dd+' '+MOISFR[mm-1]+' '+yy;
+    var dObj=new Date(parseInt(yy,10),mm-1,dd);
+    var jr=JOURSFR[dObj.getDay()];
+    var jsel=document.getElementById('inp-jour');
+    for(var z=0;z<jsel.options.length;z++){ if(jsel.options[z].value===jr){ jsel.selectedIndex=z; break; } }
+    var hd=course.heureDepart;
+    if(typeof hd==='number'){
+      var dh=new Date(hd);
+      document.getElementById('inp-heure').value=pad2(dh.getHours())+'H'+pad2(dh.getMinutes());
+    }
+    updatePreview();
+    pmuSetStatus(entrees.length+((mode==='jockeys')?' jockeys chargés (corrige un nom une fois, il sera mémorisé).':' chevaux chargés.'),'ok');
+  }catch(e){
+    pmuSetStatus('Partants non récupérés (CORS ou connexion).','err');
+  }
+}
+function remplirChevaux(){ chargerPartants('chevaux'); }
+function remplirJockeys(){ chargerPartants('jockeys'); }
+
+// ===== IMPORT COPIER-COLLER =====
+function importerPartants(){
+  var raw=document.getElementById('paste-zone').value;
+  var lines=raw.split('\n');
+  var noms=[];
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    if(!line)continue;
+    var m=line.match(/^\s*(\d{1,2})\b[\.\)\-\s]*(.*)$/);
+    var name=m?m[2]:line;
+    name=name.split('(')[0];
+    name=name.split(/\s{2,}/)[0];
+    name=name.replace(/[^A-Za-zÀ-ÿ' \-]/g,'').trim().toUpperCase();
+    var letters=name.replace(/[^A-Za-zÀ-ÿ]/g,'');
+    if(letters.length>=2)noms.push(name);
+  }
+  var st=document.getElementById('paste-status');
+  if(!noms.length){ st.className='pmu-status err'; st.textContent='Aucun cheval détecté.'; return; }
+  chevaux=[]; cid=0;
+  for(var k=0;k<noms.length;k++){ chevaux.push({id:++cid,nom:noms[k]}); }
+  renderChevaux();
+  updatePreview();
+  st.className='pmu-status ok';
+  st.textContent=noms.length+' chevaux importés.';
+}
+
+// ===== DÉDOUBLONNAGE =====
+function dedupHits(hits){
+  var vus={};
+  var out=[];
+  for(var i=0;i<hits.length;i++){
+    var cle=hits[i].full.trim().toUpperCase();
+    if(vus[cle])continue;
+    vus[cle]=1;
+    out.push(hits[i]);
+  }
+  return out;
+}
+
+// ===== ANALYSE =====
+var lastResults=[];
+
+function analyser(){
+  var mots=getMots();
+  var tpls=getTemplates();
+  var validHorses=[];
+  for(var i=0;i<chevaux.length;i++){ if(chevaux[i].nom.trim())validHorses.push(chevaux[i]); }
+
+  if(!validHorses.length){ alert('Ajoute au moins un cheval !'); return; }
+  if(!tpls.length){ alert('Coche au moins une phrase à tester !'); return; }
+
+  var allResults=[];
+  var totalTested=0;
+
+  for(var h=0;h<validHorses.length;h++){
+    var cheval=validHorses[h].nom.trim().toUpperCase();
+    var horseHits=[];
+    for(var ti=0;ti<tpls.length;ti++){
+      var tpl=tpls[ti];
+      for(var w=0;w<mots.length;w++){
+        var mot=mots[w].mot;
+        totalTested++;
+        var tokens=tpl.tokens.concat([cheval,mot]);
+        var r=calc(tokens);
+        var hitT=traceurs.indexOf(r.traceur)>=0;
+        var hitBG=blancG.indexOf(r.blancG)>=0;
+        var hitR=hitRouge(r);
+        if(hitT||hitBG||hitR){
+          var full='';
+          for(var fp=0;fp<tokens.length;fp++){ if(tokens[fp])full+=(full?' ':'')+tokens[fp]; }
+          horseHits.push({
+            phrase:cheval+' '+mot,
+            full:full,
+            template:tpl.label,
+            r:r, hitT:hitT, hitBG:hitBG, hitR:hitR,
+            double:((hitT?1:0)+(hitBG?1:0)+(hitR?1:0))>=2
+          });
+        }
+      }
+    }
+    if(horseHits.length){
+      var uniques=dedupHits(horseHits);
+      uniques.sort(function(a,b){
+        if(a.double&&!b.double)return -1;
+        if(!a.double&&b.double)return 1;
+        return Math.abs(a.r.log)-Math.abs(b.r.log);
+      });
+      allResults.push({cheval:cheval, num:(h+1), hits:uniques});
+    }
+  }
+
+  lastResults=allResults;
+
+  var card=document.getElementById('results-card');
+  var resEl=document.getElementById('results');
+  var statEl=document.getElementById('stat-line');
+  card.style.display='block';
+
+  var totalHits=0;
+  for(i=0;i<allResults.length;i++){ totalHits+=allResults[i].hits.length; }
+  statEl.innerHTML=totalTested+' combinaisons testées · <b>'+totalHits+' traceur(s) trouvé(s)</b> sur '+validHorses.length+' cheval(aux)';
+
+  if(!allResults.length){
+    resEl.innerHTML='<div class="empty">Aucun traceur trouvé.<br>Vérifie tes listes de traceurs ou ajoute des chevaux.</div>';
+    card.scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  var out='';
+  var hi=0;
+  for(i=0;i<allResults.length;i++){
+    var grp=allResults[i];
+    out+='<div class="horse-group">';
+    out+='<div class="horse-group-title"><span class="hg-disc">'+grp.num+'</span>'+esc(grp.cheval)+'<span class="hg-count">'+grp.hits.length+' hit(s)</span></div>';
+    for(var k=0;k<grp.hits.length;k++){
+      out+=renderHit(grp.hits[k],'g_'+hi);
+      hi++;
+    }
+    out+='</div>';
+  }
+  resEl.innerHTML=out;
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+function ligneDetail(base,log,tr,vg,bg,vd,rouge,facteur,hitT,hitBG){
+  return '<tr>'
+    +'<td>'+base+'</td>'
+    +'<td class="c-red">'+log+'</td>'
+    +'<td class="'+clsCellule(tr,facteur,hitT?'c-yellow':'c-neutral')+'">'+tr+'</td>'
+    +'<td class="'+clsCellule(vg,facteur,'c-green')+'">'+vg+'</td>'
+    +'<td class="'+clsCellule(bg,facteur,hitBG?'c-yellow':'c-white')+'">'+bg+'</td>'
+    +'<td class="'+clsCellule(vd,facteur,'c-green')+'">'+vd+'</td>'
+    +'<td class="c-red">'+rouge+'</td>'
+    +'</tr>';
+}
+
+function renderHit(hit,idx){
+  var r=hit.r;
+  var data={
+    phrase:hit.phrase, full:hit.full,
+    traceur:hit.hitT?r.traceur:null,
+    blancG:hit.hitBG?r.blancG:null,
+    rouge:hit.hitR?valeurRougeTouchee(r):null,
+    double:hit.double, log:r.log,
+    table:[
+      {base:'Logique',log:r.log,tr:r.traceur,vg:r.vertG,bg:r.blancG,vd:r.vertD,rouge:r.rouge},
+      {base:'Base 3',log:r.log3,tr:r.tr3,vg:r.vg3,bg:r.bg3,vd:r.vd3,rouge:r.r3},
+      {base:'Base 6',log:r.log6,tr:r.tr6,vg:r.vg6,bg:r.bg6,vd:r.vd6,rouge:r.r6},
+      {base:'Base 9',log:r.log9,tr:r.tr9,vg:r.vg9,bg:r.bg9,vd:r.vd9,rouge:r.r9}
+    ]
+  };
+  var dataHit=encodeURIComponent(JSON.stringify(data));
+
+  var badges='<div class="rc-badges">';
+  if(hit.template)badges+='<span class="rb rb-tpl">'+esc(hit.template)+'</span>';
+  if(hit.hitT)badges+='<span class="rb rb-t">Traceur '+r.traceur+'</span>';
+  if(hit.hitBG)badges+='<span class="rb rb-t">Traceur '+r.blancG+'</span>';
+  if(hit.hitR)badges+='<span class="rb rb-r">Rouge '+valeurRougeTouchee(r)+'</span>';
+  if(hit.double)badges+='<span class="rb rb-x2">Double</span>';
+  badges+='</div>';
+
+  var table='<table class="detail-table">'
+    +'<tr><th>Base</th><th>LOG(-)</th><th>Traceur</th><th>Vert G</th><th>Blanc G</th><th>Vert D</th><th>Rouge</th></tr>'
+    +ligneDetail('Logique',r.log,r.traceur,r.vertG,r.blancG,r.vertD,r.rouge,1,hit.hitT,hit.hitBG)
+    +ligneDetail('Base 3',r.log3,r.tr3,r.vg3,r.bg3,r.vd3,r.r3,3,hit.hitT,hit.hitBG)
+    +ligneDetail('Base 6',r.log6,r.tr6,r.vg6,r.bg6,r.vd6,r.r6,6,hit.hitT,hit.hitBG)
+    +ligneDetail('Base 9',r.log9,r.tr9,r.vg9,r.bg9,r.vd9,r.r9,9,hit.hitT,hit.hitBG)
+    +'</table>';
+
+  return '<div class="result-card '+(hit.double?'double':'')+'" '
+    +'data-hit="'+dataHit+'" '
+    +'oncontextmenu="ouvrirModal(this);return false;" '
+    +'ontouchstart="startLongPress(this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">'
+    +badges
+    +'<div class="rc-phrase" onclick="toggleDetail(\''+idx+'\')">'+esc(hit.phrase)+' &#9660;</div>'
+    +'<div class="detail" id="detail-'+idx+'" style="display:none;">'
+    +'<div class="detail-phrase">'+esc(hit.full)+'</div>'
+    +table
+    +'</div>'
+    +'</div>';
+}
+
+function toggleDetail(idx){
+  var el=document.getElementById('detail-'+idx);
+  if(el)el.style.display=(el.style.display==='none')?'block':'none';
+}
+
+// ===== APPUI LONG =====
+var longPressTimer=null;
+function startLongPress(el){
+  cancelLongPress();
+  longPressTimer=setTimeout(function(){ ouvrirModal(el); },600);
+}
+function cancelLongPress(){
+  if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; }
+}
+
+// ===== MODAL =====
+var hitEnAttente=null;
+function ouvrirModal(el){
+  var raw=el.getAttribute('data-hit');
+  if(!raw)return;
+  hitEnAttente=JSON.parse(decodeURIComponent(raw));
+  document.getElementById('modal-phrase-text').textContent=hitEnAttente.full||hitEnAttente.phrase;
+  var sel=document.getElementById('modal-semaine-sel');
+  sel.innerHTML='';
+  var now=new Date();
+  var semActuelle=getNumeroSemaine(now);
+  var s,opt;
+  for(s=semActuelle;s<=52;s++){
+    opt=document.createElement('option');
+    opt.value='S'+s;
+    opt.textContent='Semaine '+s+(s===semActuelle?' (cette semaine)':'');
+    sel.appendChild(opt);
+  }
+  for(s=1;s<semActuelle;s++){
+    opt=document.createElement('option');
+    opt.value='S'+s;
+    opt.textContent='Semaine '+s;
+    sel.appendChild(opt);
+  }
+  document.getElementById('modal-save').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal-save').classList.remove('show');
+  hitEnAttente=null;
+}
+function confirmerSave(){
+  if(!hitEnAttente)return;
+  var sem=document.getElementById('modal-semaine-sel').value;
+  sauvegarderHit(sem,hitEnAttente);
+  closeModal();
+  var cc=document.getElementById('carnet-card');
+  cc.style.display='block';
+  renderCarnet();
+  cc.scrollIntoView({behavior:'smooth'});
+}
+
+// ===== NUMERO SEMAINE ISO =====
+function getNumeroSemaine(d){
+  var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var day=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-day);
+  var yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+
+// ===== CARNET LOCALSTORAGE =====
+function getCarnet(){
+  try{ return JSON.parse(localStorage.getItem('cheval26_chevaux_carnet')||'{}'); }catch(e){ return {}; }
+}
+function saveCarnet(data){
+  try{ localStorage.setItem('cheval26_chevaux_carnet',JSON.stringify(data)); }catch(e){}
+}
+function sauvegarderHit(semaine,hit){
+  var data=getCarnet();
+  if(!data[semaine])data[semaine]=[];
+  var exists=false;
+  for(var i=0;i<data[semaine].length;i++){ if(data[semaine][i].full===hit.full){exists=true;break;} }
+  if(!exists){
+    var entry=Object.assign({},hit,{savedAt:new Date().toLocaleString('fr-FR')});
+    data[semaine].unshift(entry);
+    saveCarnet(data);
+  }
+}
+function supprimerHit(semaine,idx){
+  var data=getCarnet();
+  if(data[semaine]){
+    data[semaine].splice(idx,1);
+    if(!data[semaine].length)delete data[semaine];
+    saveCarnet(data);
+    renderCarnet();
+  }
+}
+
+// ===== RENDU CARNET =====
+function toggleCarnet(){
+  var cc=document.getElementById('carnet-card');
+  var visible=cc.style.display!=='none';
+  cc.style.display=visible?'none':'block';
+  if(!visible)renderCarnet();
+}
+function toggleSemaine(sem){
+  var body=document.getElementById('carnet-sem-'+sem);
+  var chev=document.getElementById('carnet-chev-'+sem);
+  if(!body)return;
+  var open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  if(chev)chev.classList.toggle('open',!open);
+}
+function toggleHitDetail(sem,idx){
+  var el=document.getElementById('carnet-detail-'+sem+'-'+idx);
+  if(el)el.classList.toggle('open');
+}
+
+function renderCarnet(){
+  var data=getCarnet();
+  var body=document.getElementById('carnet-body');
+  var keys=Object.keys(data).sort(function(a,b){ return parseInt(b.replace('S',''),10)-parseInt(a.replace('S',''),10); });
+  if(!keys.length){
+    body.innerHTML='<div style="text-align:center;padding:20px;font-size:12px;color:var(--text3);">Aucun hit enregistré.<br>Reste appuyé sur un résultat pour l\'ajouter ici.</div>';
+    return;
+  }
+  var html='';
+  for(var ki=0;ki<keys.length;ki++){
+    var sem=keys[ki];
+    var hits=data[sem];
+    var semNum=parseInt(sem.replace('S',''),10);
+
+    var parTraceur={};
+    var ordre=[];
+    for(var i=0;i<hits.length;i++){
+      var hh=hits[i];
+      var nums=[];
+      if(hh.traceur)nums.push(String(hh.traceur));
+      if(hh.blancG&&hh.blancG!==hh.traceur)nums.push(String(hh.blancG));
+      if(hh.rouge)nums.push('R'+hh.rouge);
+      if(!nums.length)nums.push('-');
+      for(var n=0;n<nums.length;n++){
+        var key=nums[n];
+        if(!parTraceur[key]){ parTraceur[key]=[]; ordre.push(key); }
+        parTraceur[key].push({h:hh,i:i});
+      }
+    }
+    var numsTries=ordre.sort(function(a,b){
+      var ra=a.charAt(0)==='R', rb=b.charAt(0)==='R';
+      if(ra&&!rb)return 1; if(!ra&&rb)return -1;
+      var na=parseInt(a.replace('R',''),10), nb=parseInt(b.replace('R',''),10);
+      if(isNaN(na))return 1; if(isNaN(nb))return -1;
+      return na-nb;
+    });
+
+    var corps='';
+    for(var t=0;t<numsTries.length;t++){
+      var num=numsTries[t];
+      var estRouge=num.charAt(0)==='R';
+      var numAff=num.replace('R','');
+      var liste=parTraceur[num];
+      corps+='<div class="traceur-bloc">';
+      corps+='<div class="traceur-bloc-title"'+(estRouge?' style="color:var(--rouge);"':'')+'>'+(estRouge?'Rouge ':'Traceur ')+numAff+' <span class="cat-count">'+liste.length+'</span></div>';
+      for(var li=0;li<liste.length;li++){
+        var h=liste[li].h;
+        var ri=liste[li].i;
+        var meta='';
+        if(h.traceur)meta+='<span class="rb rb-t" style="font-size:10px;">'+h.traceur+'</span>';
+        if(h.blancG)meta+='<span class="rb rb-t" style="font-size:10px;">'+h.blancG+'</span>';
+        if(h.rouge)meta+='<span class="rb rb-r" style="font-size:10px;">R'+h.rouge+'</span>';
+        if(h.double)meta+='<span class="rb rb-x2" style="font-size:10px;">Double</span>';
+        meta+='<span style="color:var(--text3);font-size:9px;">'+esc(h.savedAt||'')+'</span>';
+
+        var tableSaved='';
+        if(h.table){
+          tableSaved='<table class="detail-table"><tr><th>Base</th><th>LOG(-)</th><th>Traceur</th><th>Vert G</th><th>Blanc G</th><th>Vert D</th><th>Rouge</th></tr>';
+          for(var rr=0;rr<h.table.length;rr++){
+            var row=h.table[rr];
+            var f={'Logique':1,'Base 3':3,'Base 6':6,'Base 9':9}[row.base]||1;
+            tableSaved+=ligneDetail(row.base,row.log,row.tr,row.vg,row.bg,row.vd,row.rouge,f,!!h.traceur,!!h.blancG);
+          }
+          tableSaved+='</table>';
+        }
+
+        corps+='<div class="hit-saved">'
+          +'<button class="hit-saved-del" onclick="supprimerHit(\''+sem+'\','+ri+')">&times;</button>'
+          +'<div class="hit-saved-phrase" onclick="toggleHitDetail(\''+sem+'\','+ri+')">'+esc(h.phrase)+' &#9660;</div>'
+          +'<div class="hit-saved-meta">'+meta+'</div>'
+          +'<div class="hit-saved-detail" id="carnet-detail-'+sem+'-'+ri+'">'
+          +'<div style="font-size:10px;font-family:var(--mono);color:var(--text2);background:var(--surface3);padding:6px 8px;border-radius:5px;margin-bottom:6px;">'+esc(h.full||'')+'</div>'
+          +tableSaved
+          +'</div>'
+          +'</div>';
+      }
+      corps+='</div>';
+    }
+
+    html+='<div>'
+      +'<div class="semaine-header" onclick="toggleSemaine(\''+sem+'\')">'
+      +'<div><div class="semaine-label">Semaine '+semNum+'</div><div class="semaine-count">'+hits.length+' hit(s) enregistré(s)</div></div>'
+      +'<div class="semaine-chevron" id="carnet-chev-'+sem+'">&#9660;</div>'
+      +'</div>'
+      +'<div class="semaine-body" id="carnet-sem-'+sem+'">'+corps+'</div>'
+      +'</div>';
+  }
+  body.innerHTML=html;
+}
+
+// ===== INIT =====
+addCheval('');
+document.getElementById('modal-save').addEventListener('click',function(e){ if(e.target===this)closeModal(); });
+(function(){
+  var d=new Date();
+  var sel=document.getElementById('inp-jour');
+  var jr=JOURSFR[d.getDay()];
+  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===jr){ sel.selectedIndex=i; break; } }
+  document.getElementById('inp-date').value=d.getDate()+' '+MOISFR[d.getMonth()]+' '+d.getFullYear();
+  document.getElementById('pmu-date').value=d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+  try{ var pp=localStorage.getItem('cheval26_pmu_proxy'); if(pp){document.getElementById('pmu-proxy').value=pp;} else if(PMU_PROXY_DEFAULT){document.getElementById('pmu-proxy').value=PMU_PROXY_DEFAULT;} }catch(e){ if(PMU_PROXY_DEFAULT){ var pf=document.getElementById('pmu-proxy'); if(pf){pf.value=PMU_PROXY_DEFAULT;} } }
+})();
+updatePreview();
+</script>
+</body>
+</html>
