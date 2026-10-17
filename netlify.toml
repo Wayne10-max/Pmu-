@@ -1,0 +1,14 @@
+[build]
+  command = "unzip -oq Tableur_ZEturf_Netlify.zip -d app && cd app && npm test"
+  publish = "app/public"
+  functions = "app/netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/test-zeturf.html"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'"
