@@ -1,5 +1,5 @@
 [build]
-  command = "unzip -oq Tableur_ZEturf_Netlify.zip -d app && cd app && npm test"
+  command = "unzip -oq Tableur_ZEturf_Netlify_CORRIGE.zip -d app && cd app && npm test"
   publish = "app/public"
   functions = "app/netlify/functions"
 
